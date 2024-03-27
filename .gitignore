@@ -1,0 +1,7 @@
+test/
+.env
+*.env
+trash/
+query_engine/
+vectorizer/__pycache__/
+vectorizer/uploads/*
