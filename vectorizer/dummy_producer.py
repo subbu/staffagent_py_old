@@ -1,4 +1,3 @@
-import uuid
 import datetime
 import socket
 from decouple import config
@@ -25,7 +24,7 @@ def user_to_dictionary(user: User, ctx: SerializationContext) -> dict:
     )
 
 
-def delivery_report(err: any, msg: any):
+def delivery_report(err: any, msg: any) -> None:
     if err is not None:
         print("Delivery failed for User record {}: {}".format(msg.key(), err))
         return
@@ -34,30 +33,26 @@ def delivery_report(err: any, msg: any):
 
 
 def get_schema_config() -> SchemaRegistryClient:
-    schema_registry_conf = {"url": "http://localhost:8081"}
+    schema_registry_conf = {"url": config(
+        "SCHEMA_REGISTRY_URl", default="http://localhost:8081", cast=str)}
     return schema_registry_conf
 
 
 def get_producer() -> Producer:
     producer = Producer({
-        'bootstrap.servers': '127.0.0.1:19092',
-        'client.id': socket.gethostname()
-    }
-    )
+        'bootstrap.servers': config("BROKER_URL", default='127.0.0.1:19092', cast=str),
+        'client.id': socket.gethostname()})
     return producer
 
 
 def main():
-    topic_name = "theonlytopic"  # config('TOPIC_NAME', cast=str)
-    # num_partitions = config('NUM_PARTITIONS', default=1, cast=int)
-    # broker_address = config('BROKER_URL', cast=str)
+    topic_name = config('TOPIC_NAME', default="theonlytopic", cast=str)
     schema_client = SchemaRegistryClient(get_schema_config())
     key_serializer = StringSerializer()
     value_serializer = JSONSerializer(
         SCHEMA_STR, schema_client, user_to_dictionary)
     producer = get_producer()
 
-    # while True :
     try:
         user = User(id='25',
                     name="Vishal_Arora.pdf",

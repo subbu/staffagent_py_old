@@ -26,23 +26,3 @@ class User():
         self.blob_url = blob_url  # : str | None
         self.position_applied_for = position_applied_for  # : str  # FOR NAMESPACE
         self.company_name = company_name  # : str  # INDEX FOR COMPANY
-
-
-class Document(BaseModel):
-    id: uuid.UUID  # UNIQUE
-    name: str
-    type: str  # TXT or PDF
-    email: str
-    phone_number: str
-    resume_content: str | None
-    captured_at: datetime.datetime
-    blob_url: str | None
-    position_applied_for: str  # FOR NAMESPACE
-    company_name: str  # INDEX FOR COMPANY
-
-
-class Chunk(BaseModel):
-    id: uuid.UUID
-    chunk_id: uuid.UUID
-    metadata: dict[str, str | list[str]]
-    blob_url: str
