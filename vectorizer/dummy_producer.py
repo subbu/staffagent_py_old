@@ -7,42 +7,7 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.json_schema import JSONSerializer
 from constants import SCHEMA_STR
 from models import User
-
-
-def user_to_dictionary(user: User, ctx: SerializationContext) -> dict:
-    return dict(
-        id=user.id,
-        name=user.name,
-        type=user.type,
-        email=user.email,
-        phone_number=user.phone_number,
-        resume_content=user.resume_content,
-        captured_at=user.captured_at,
-        blob_url=user.blob_url,
-        position_applied_for=user.position_applied_for,
-        company_name=user.company_name
-    )
-
-
-def delivery_report(err: any, msg: any) -> None:
-    if err is not None:
-        print("Delivery failed for User record {}: {}".format(msg.key(), err))
-        return
-    print('User record {} successfully produced to {} [{}] at offset {}'.format(
-        msg.key(), msg.value(), msg.topic(), msg.partition(), msg.offset()))
-
-
-def get_schema_config() -> SchemaRegistryClient:
-    schema_registry_conf = {"url": config(
-        "SCHEMA_REGISTRY_URl", default="http://localhost:8081", cast=str)}
-    return schema_registry_conf
-
-
-def get_producer() -> Producer:
-    producer = Producer({
-        'bootstrap.servers': config("BROKER_URL", default='127.0.0.1:19092', cast=str),
-        'client.id': socket.gethostname()})
-    return producer
+from queue_utils import user_to_dictionary, delivery_report, get_producer, get_schema_config
 
 
 def main():
@@ -51,7 +16,7 @@ def main():
     key_serializer = StringSerializer()
     value_serializer = JSONSerializer(
         SCHEMA_STR, schema_client, user_to_dictionary)
-    producer = get_producer()
+    producer = Producer(get_producer())
 
     try:
         user = User(id='25',

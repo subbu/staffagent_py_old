@@ -63,3 +63,29 @@ SCHEMA_STR = """
     "additionalProperties": true
 }
 """
+
+
+REPLY_BACK_STR = """
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ReplyBack",
+    "description": "Schema for ReplyBack model",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "Unique identifier for the user (UUID)"
+        },
+        "status": {
+            "type": "string",
+            "description": "Status for Indexing"
+        },
+        "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the user data was captured"
+        }
+    },
+    "required": ["id", "status", "captured_at"],
+    "additionalProperties": true
+}
+"""

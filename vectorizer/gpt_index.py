@@ -6,11 +6,15 @@ from llama_parse import LlamaParse
 from pdf_chunker import chunker, to_textnodes, append_metadata
 from embeddings_openai import append_embeddings
 from models import User
+from reply_class import ReplyBackProducerClass, IndexingStatus
 
 
-def process_data(user: User) -> None:
+def process_data(user: User, reply_back_producer_instance: ReplyBackProducerClass) -> None:
     pinecone_instance = PineconeManager("resumestore", config(  # store needs to be done serverless in future and different for different orgs
         "PINECONE_API_KEY", default=None, cast=str))
+
+    reply_back_producer_instance.put_to_queue(
+        status=IndexingStatus.IN_PROGRESS, id=user.id)
 
     if download_from_blob_storage(user.blob_url):
         print("File Downloaded Successfully")
@@ -35,6 +39,9 @@ def process_data(user: User) -> None:
     nodes = append_metadata(nodes, user)
     nodes = append_embeddings(nodes)
     pinecone_instance.upsert_to_pinecone(nodes)
+
+    reply_back_producer_instance.put_to_queue(
+        status=IndexingStatus.SUCCESS, id=user.id)
 
 
 # user = User(id='25',

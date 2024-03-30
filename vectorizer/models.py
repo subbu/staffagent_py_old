@@ -1,6 +1,4 @@
 import datetime
-import uuid
-from pydantic import BaseModel
 
 
 class User():
@@ -26,3 +24,10 @@ class User():
         self.blob_url = blob_url  # : str | None
         self.position_applied_for = position_applied_for  # : str  # FOR NAMESPACE
         self.company_name = company_name  # : str  # INDEX FOR COMPANY
+
+
+class ReplyBack():
+    def __init__(self, id: str, captured_at: datetime.datetime, status: str) -> None:
+        self.id = id
+        self.captured_at = captured_at
+        self.status = status
