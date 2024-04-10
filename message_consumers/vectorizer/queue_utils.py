@@ -23,7 +23,7 @@ def dict_to_user(obj, ctx) -> User:
 
 def get_consumer() -> dict:
     consumer_conf = {
-        'bootstrap.servers': config("BROKER_URL", default='127.0.0.1:19092', cast=str),
+        'bootstrap.servers': config("BROKER_URL", default='kafka:19092', cast=str),
         'group.id': 'group1',  # for proto we have just one group to be looked in later stages
         'auto.offset.reset': 'latest'
     }
@@ -63,7 +63,7 @@ def delivery_report(err: any, msg: any) -> None:
 
 def get_producer() -> dict:
     producer_conf = {
-        'bootstrap.servers': config("BROKER_URL", default='127.0.0.1:19092', cast=str),
+        'bootstrap.servers': config("BROKER_URL", default='kafka:19092', cast=str),
         'client.id': socket.gethostname()
     }
     return producer_conf
