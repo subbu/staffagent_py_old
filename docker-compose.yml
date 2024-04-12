@@ -42,10 +42,10 @@ services:
       KAFKA_BROKER_URL: kafka:9092
       KAFKA_GROUP_ID: data_extractor_group
       KAFKA_TOPIC: data_extractor
-      OPENAI_API_KEY: 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
-      AWS_ACCESS_KEY_ID: AKIASMHMWUNYBYOLG43O
-      AWS_SECRET_ACCESS_KEY: 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
-      REGION_NAME: us-east-1
+      OPENAI_API_KEY: 
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY: 
+      REGION_NAME: 
       STAFF_AGENT_API_URL: http://host.docker.internal:4000/v1/api
 
   api_services:

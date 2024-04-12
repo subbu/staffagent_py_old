@@ -92,7 +92,7 @@ class StaffAgentAPIClient:
         response = requests.post(f"{self.base_url}{endpoint}", json=data)
 
         print("Response from post_data")
-        return response.json()
+        # return response.json()
 
 staff_agent_api_client = StaffAgentAPIClient(STAFF_AGENT_API_URL)
 
