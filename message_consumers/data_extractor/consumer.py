@@ -5,7 +5,6 @@ import os
 import json
 from resume.extraction import ResumeExtractor
 from resume.processing import ResumeProcessor
-from config import KAFKA_CONFIG, KAFKA_TOPIC, OPENAI_API_KEY
 
 logging.basicConfig(level=logging.INFO)
 

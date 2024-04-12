@@ -1,16 +1,16 @@
 import PyPDF2
 import io
 import boto3
-from config import aws_access_key_id, aws_secret_access_key, region_name
+import os
 
 class ResumeExtractor:
     @staticmethod
     def extract_text_from_pdf(path):
     # Use PyPDF2 to extract info from PDF
         session = boto3.Session(
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+            region_name=os.getenv("REGION_NAME")
         )
         s3 = session.client('s3')
         bucket, key = path.replace("s3://", "").split("/", 1)
