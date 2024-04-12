@@ -28,8 +28,6 @@ class Call(BaseModel):
 
 class StaffAgentAPIClient:
     def __init__(self, base_url):
-
-        print("hello world")
         self.base_url = base_url
         self.endpoints = {
             'list_calls': '/calls',
@@ -37,7 +35,7 @@ class StaffAgentAPIClient:
             'get_call': '/calls/{call_id}',
             'update_call': '/calls/{call_id}',
             'get_call_context': '/call-context/{call_id}',
-            'post_data':'/data_tables/{data_id}/data_dumps'
+            'post_data':'/data_tables/{id}/data_dumps'
         }
 
     def get_calls(self):
@@ -80,18 +78,20 @@ class StaffAgentAPIClient:
         return response.json()['data']
     
     def post_data(self, data_table, json_dump):
-
-
-        data_table_id = data_table['id']
+        print("Entered here post_data")
+        print(data_table)
+        print("===================")
+        print(json_dump)
+        data_table_id = data_table['data_table_schema']['id']
         data = {
             'data': json_dump,
-            'data_table_id': data_table_id
+            'id': data_table_id
         }
 
-        endpoint = self.endpoints['post_data']
+        endpoint = self.endpoints['post_data'].format(id=data_table_id)
         response = requests.post(f"{self.base_url}{endpoint}", json=data)
 
-        
+        print("Response from post_data")
         return response.json()
 
 staff_agent_api_client = StaffAgentAPIClient(STAFF_AGENT_API_URL)

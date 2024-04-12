@@ -30,3 +30,5 @@ typer==0.9.4
 typing_extensions==4.10.0
 yarl==1.9.4
 boto3==1.21.2
+python-dotenv==1.0.1
+requests

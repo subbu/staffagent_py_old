@@ -5,6 +5,13 @@ import os
 import json
 from resume.extraction import ResumeExtractor
 from resume.processing import ResumeProcessor
+from dotenv import load_dotenv
+from staffagent_api import staff_agent_api_client
+
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -74,15 +81,20 @@ def process_message(msg):
     """
     logging.info(f"Processing message from topic {msg.topic()}, partition {msg.partition()}, offset {msg.offset()}")
     data = json.loads(msg.value().decode('utf-8'))
-    print(data['resume_path'], data['job_application_id'], data['output_format'])
+    
     text = ResumeExtractor.extract_text_from_pdf(data['resume_path'])
-    print("Extracted Text:")
-    print(text)
+ 
 
     resume_processor = ResumeProcessor(OPENAI_API_KEY)
     structured_info = resume_processor.process_resume(text)
-    print("\nStructured Information:")
-    print(structured_info)
+    
+   
+    api_client =staff_agent_api_client
+
+
+    # Call the post_data function with the data_table and the structured_info as the json_dump
+    api_client.post_data(data, structured_info)
+    
 
 if __name__ == '__main__':
     main()
