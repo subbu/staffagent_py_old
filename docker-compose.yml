@@ -14,6 +14,7 @@ services:
       - zookeeper
     networks:
       - kafka_network
+    restart: always
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -25,7 +26,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: 'false'
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-
     ports:
       - "9092:9092"
 
@@ -47,6 +47,20 @@ services:
       AWS_SECRET_ACCESS_KEY: 
       REGION_NAME: 
       STAFF_AGENT_API_URL: http://host.docker.internal:4000/v1/api
+  
+  vectorizer:
+    build:
+      context: ./message_consumers/vectorizer
+      dockerfile: Dockerfile.vectorizer
+    depends_on:
+      - kafka
+    networks:
+      - kafka_network
+    restart: always
+    command: /bin/sh -c "env && python consumer.py"
+    env_file:
+      - path : .env 
+        required : true
 
   api_services:
     build:

@@ -1,38 +1,32 @@
+import os
+import json
 import datetime
-import socket
-from decouple import config
 from confluent_kafka import Producer
-from confluent_kafka.serialization import StringSerializer, SerializationContext, MessageField
-from confluent_kafka.schema_registry import SchemaRegistryClient
-from confluent_kafka.schema_registry.json_schema import JSONSerializer
-from constants import SCHEMA_STR
-from models import User
-from queue_utils import user_to_dictionary, delivery_report, get_producer, get_schema_config
+from confluent_kafka.serialization import StringSerializer
+from models.models import User
+from utils.queue_utils import delivery_report, get_producer
+from dotenv import load_dotenv
 
+load_dotenv()
+TOPIC_NAME = os.getenv('TOPIC_NAME','vectorize')
 
 def main():
-    topic_name = config('TOPIC_NAME', default="theonlytopic", cast=str)
-    schema_client = SchemaRegistryClient(get_schema_config())
+    topic_name = TOPIC_NAME
     key_serializer = StringSerializer()
-    value_serializer = JSONSerializer(
-        SCHEMA_STR, schema_client, user_to_dictionary)
+    value_serializer = StringSerializer()
     producer = Producer(get_producer())
 
     try:
-        user = User(id='25',
-                    name="Vishal_Arora.pdf",
+        user = User(job_application_id='25',
                     type="pdf",
-                    email="Vishal_Arora.pdf",
-                    phone_number="+25025025",
                     resume_content=".",
                     captured_at=str(datetime.datetime.now()),
-                    blob_url="https://storageforpdf.blob.core.windows.net/storageforpdf/Vishal_Arora.pdf",
-                    position_applied_for="Software Developer Intern",
-                    company_name="Google")
+                    resume_path="https://staffagent-dev-resumes.s3.amazonaws.com/Sanjaykumard_Resume.pdf",
+                    position_applied_for="Software Developer Intern")
+        user_json = json.dumps(user.__dict__)
         producer.produce(topic=topic_name,
-                         key=key_serializer(user.id),
-                         value=value_serializer(user, SerializationContext(
-                             topic_name, MessageField.VALUE)),
+                         key=key_serializer(user.job_application_id),
+                         value=value_serializer(user_json),
                          on_delivery=delivery_report)
     except ValueError:
         print("Value Error")

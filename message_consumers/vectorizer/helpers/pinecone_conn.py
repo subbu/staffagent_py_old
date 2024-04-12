@@ -1,7 +1,5 @@
 from pinecone.grpc import PineconeGRPC
 from llama_index.vector_stores.pinecone import PineconeVectorStore
-from decouple import config
-from constants import INDEX_NAME
 
 
 class PineconeManager:

@@ -2,6 +2,10 @@ test/
 .env
 *.env
 trash/
-query_engine/
-vectorizer/__pycache__/
-vectorizer/uploads/*
+venv/
+
+message_consumers/vectorizer/__pycache__/
+message_consumers/vectorizer/helpers/__pycache__/
+message_consumers/vectorizer/utils/__pycache__/
+message_consumers/vectorizer/models/__pycache__/
+message_consumers/vectorizer/dummy_producer.py

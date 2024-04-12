@@ -1,31 +1,34 @@
 import os
-from pinecone_conn import PineconeManager
-from decouple import config
-from azure_helpers import download_from_blob_storage
+from helpers.pinecone_conn import PineconeManager
+from helpers.aws_helper import download_file_from_s3
 from llama_parse import LlamaParse
-from pdf_chunker import chunker, to_textnodes, append_metadata
-from embeddings_openai import append_embeddings
-from models import User
-from reply_class import ReplyBackProducerClass, IndexingStatus
+from helpers.pdf_chunker import chunker, to_textnodes, append_metadata
+from helpers.embeddings_openai import append_embeddings
+from models.models import User
+from models.reply_class import ReplyBackProducerClass, IndexingStatus
+from urllib.parse import urlparse
+from dotenv import load_dotenv
 
+load_dotenv()
+
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+LLAMA_INDEX_API_KEY = os.getenv("LLAMA_INDEX_API_KEY")
 
 def process_data(user: User, reply_back_producer_instance: ReplyBackProducerClass) -> None:
-    pinecone_instance = PineconeManager("resumestore", config(  # store needs to be done serverless in future and different for different orgs
-        "PINECONE_API_KEY", default=None, cast=str))
+    pinecone_instance = PineconeManager("resumestore", PINECONE_API_KEY)
 
     reply_back_producer_instance.put_to_queue(
-        status=IndexingStatus.IN_PROGRESS, id=user.id)
+        status=IndexingStatus.IN_PROGRESS, job_application_id=user.job_application_id)
 
-    if download_from_blob_storage(user.blob_url):
+    if download_file_from_s3(user.resume_path):
         print("File Downloaded Successfully")
     else:
         exit
-    parser = LlamaParse(api_key=config("LLAMA_INDEX_API_KEY",
-                        default=None, cast=str), result_type="text")
+    parser = LlamaParse(api_key= LLAMA_INDEX_API_KEY, result_type="text")
 
-    parts = user.blob_url.split('/')
-    blob_name = parts[-1]
-    PATHTO_BLOB_URL = "uploads/" + blob_name
+    parsed_url = urlparse(user.resume_path)
+    object_key = parsed_url.path.lstrip('/')
+    PATHTO_BLOB_URL = "uploads/" + object_key
     documents = parser.load_data(PATHTO_BLOB_URL)
 
     if os.path.exists(PATHTO_BLOB_URL):
@@ -41,17 +44,5 @@ def process_data(user: User, reply_back_producer_instance: ReplyBackProducerClas
     pinecone_instance.upsert_to_pinecone(nodes)
 
     reply_back_producer_instance.put_to_queue(
-        status=IndexingStatus.SUCCESS, id=user.id)
+        status=IndexingStatus.SUCCESS, job_application_id=user.job_application_id)
 
-
-# user = User(id='25',
-#             name="Vishal_Arora.pdf",
-#             type="pdf",
-#             email="Vishal_Arora.pdf",
-#             phone_number="+25025025",
-#             resume_content=".",
-#             captured_at=str(datetime.datetime.now()),
-#             blob_url="https://storageforpdf.blob.core.windows.net/storageforpdf/Vishal_Arora.pdf",
-#             position_applied_for="Software Developer Intern",
-#             company_name="Google")
-# process_data(user=user)

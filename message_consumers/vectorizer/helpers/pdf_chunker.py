@@ -1,8 +1,14 @@
+import os
 from llama_index.core.node_parser import SentenceSplitter
-from constants import CHUNK_OVERLAP_SIZE, CHUNK_SIZE
-from data_cleaner import remove_unwanted_chars
+from .data_cleaner import remove_unwanted_chars
 from llama_index.core.schema import TextNode
-from models import User
+from models.models import User
+from dotenv import load_dotenv
+
+load_dotenv()
+
+CHUNK_SIZE = os.getenv("CHUNK_SIZE")
+CHUNK_OVERLAP_SIZE = os.getenv("CHUNK_OVERLAP_SIZE")
 
 
 def chunker(documents) -> tuple[list, list]:
@@ -36,13 +42,12 @@ def to_textnodes(documents, text_chunks: list, doc_idxs: list) -> list[TextNode]
 
 def append_metadata(nodes: list[TextNode], user: User) -> list[TextNode]:
     metadata = {
-        "id": user.id,
-        "name": user.name,
-        "phone_number": user.phone_number,
-        "email": user.email,
+        "job_application_id": user.job_application_id,
+        "type": user.type,
+        "resume_content": user.resume_content,
+        "resume_path": user.resume_path,
         "captured_at": user.captured_at,
-        "position_applied": user.position_applied_for,
-        "company_name": user.company_name
+        "position_applied": user.position_applied_for
     }
     for i in range(len(nodes)):
         nodes[i].metadata = metadata
