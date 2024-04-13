@@ -1,5 +1,5 @@
 from models.dynamic_schema import DynamicSchemaCreator
-from schemas.fields_data import fields_data
+# from schemas.fields_data import fields_data
 from openai import OpenAI
 from instructor import patch
 import instructor
@@ -7,10 +7,15 @@ from pydantic import ValidationError
 import json
 
 class ResumeProcessor:
-    def __init__(self, openai_api_key):
+    def __init__(self, openai_api_key,data_schema):
         self.openai_client = instructor.patch(OpenAI(api_key=openai_api_key))
+        self.data_schema = data_schema
 
     def process_resume(self, text):
+
+        fields_data  = self.data_schema
+
+     
         
         prompt = f"""Please extract all the  information from the given resume text and return it in the specified JSON format:
 
@@ -22,6 +27,9 @@ class ResumeProcessor:
 
 
         GeneratedSchema = DynamicSchemaCreator.create_dynamic_schema(fields_data)
+
+
+       
 
         
 

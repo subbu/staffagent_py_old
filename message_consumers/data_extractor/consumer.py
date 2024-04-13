@@ -82,10 +82,14 @@ def process_message(msg):
     logging.info(f"Processing message from topic {msg.topic()}, partition {msg.partition()}, offset {msg.offset()}")
     data = json.loads(msg.value().decode('utf-8'))
     
+    data_schema =  data['data_table_schema']['columns']
+
+   
+
     text = ResumeExtractor.extract_text_from_pdf(data['resume_path'])
  
 
-    resume_processor = ResumeProcessor(OPENAI_API_KEY)
+    resume_processor = ResumeProcessor(OPENAI_API_KEY,data_schema)
     structured_info = resume_processor.process_resume(text)
     
    

@@ -38,16 +38,10 @@ services:
     networks:
       - kafka_network
     command: /bin/sh -c "env && python consumer.py"
-    environment:
-      KAFKA_BROKER_URL: kafka:9092
-      KAFKA_GROUP_ID: data_extractor_group
-      KAFKA_TOPIC: data_extractor
-      OPENAI_API_KEY: 
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY: 
-      REGION_NAME: 
-      STAFF_AGENT_API_URL: http://host.docker.internal:4000/v1/api
-  
+    restart: always
+    env_file: .env
+      
+        
   vectorizer:
     build:
       context: ./message_consumers/vectorizer
@@ -58,9 +52,7 @@ services:
       - kafka_network
     restart: always
     command: /bin/sh -c "env && python consumer.py"
-    env_file:
-      - path : .env 
-        required : true
+    env_file: .env
 
   api_services:
     build:
