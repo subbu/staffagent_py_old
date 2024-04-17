@@ -1,5 +1,5 @@
 # Use an official Python runtime as a base image
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 # Set environment variables that ensure output from python is sent straight to the terminal without being buffered
 ENV PYTHONUNBUFFERED 1
@@ -13,12 +13,12 @@ COPY requirements.txt ./
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the current directory contents into the container at /app
-COPY . .
 
+COPY . .
+# Copy the current directory contents into the container at /app
 
 # Your application runs on port 8000, expose it
-EXPOSE 8001
+EXPOSE 8000
 
 # Run the API service when the container launches
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -61,8 +61,19 @@ services:
     networks:
       - kafka_network
     ports:
+      - "8001:8001"
+    command: /bin/sh -c "uvicorn main:app --host 0.0.0.0 --port 8001"
+
+  retellai_agent:
+    build:
+      context: ./agents/retell_ai
+      dockerfile: Dockerfile.retell_ai
+    networks:
+      - kafka_network
+    ports:
       - "8000:8000"
-    command: /bin/sh -c "uvicorn main:app --host 0.0.0.0 --port 8000"
+    command: /bin/sh -c "uvicorn server:app --host 0.0.0.0 --port 8000"
+    env_file: .env
 
 networks:
   kafka_network:
