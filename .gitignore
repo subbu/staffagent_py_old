@@ -9,3 +9,8 @@ message_consumers/vectorizer/helpers/__pycache__/
 message_consumers/vectorizer/utils/__pycache__/
 message_consumers/vectorizer/models/__pycache__/
 message_consumers/vectorizer/dummy_producer.py
+
+
+agents/retell_ai/__pycache__/
+
+api_services/__pycache__/
