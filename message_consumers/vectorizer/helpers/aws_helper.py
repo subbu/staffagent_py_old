@@ -16,15 +16,16 @@ def download_file_from_s3(file_url) -> bool:
         os.makedirs(TARGET_DIR)
         
     parsed_url = urlparse(file_url)
-    bucket_name = file_url.split(".s3")[0].split("//")[1]
+    bucket_name = os.getenv("BUCKET_NAME")
     object_key = parsed_url.path.lstrip('/')
     s3 = boto3.client('s3',
     aws_access_key_id=aws_access_key_id,
     aws_secret_access_key=aws_secret_access_key)
     try:
+        print(bucket_name," ",object_key)
         target_path = os.path.join(TARGET_DIR,object_key)
         print(target_path)
-        s3.download_file("staffagent-dev-resumes", object_key, target_path)
+        s3.download_file(bucket_name, object_key, target_path)
         print(f"File downloaded successfully from {file_url} to {TARGET_DIR}")
         return True
     except botocore.exceptions.ClientError as e:

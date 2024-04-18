@@ -18,7 +18,7 @@ COPY . .
 
 
 # Your application runs on port 8000, expose it
-EXPOSE 8001
+EXPOSE 8002
 
 # Run the API service when the container launches
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]

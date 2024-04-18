@@ -21,7 +21,7 @@ def main():
                     type="pdf",
                     resume_content=".",
                     captured_at=str(datetime.datetime.now()),
-                    resume_path="https://staffagent-dev-resumes.s3.amazonaws.com/Sanjaykumard_Resume.pdf",
+                    resume_path="https://moveplan.s3.amazonaws.com/014d5a2c-a064-41ab-8ea2-9622ed4fd57a.pdf",
                     position_applied_for="Software Developer Intern")
         user_json = json.dumps(user.__dict__)
         producer.produce(topic=topic_name,
