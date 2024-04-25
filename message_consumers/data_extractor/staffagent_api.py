@@ -78,10 +78,10 @@ class StaffAgentAPIClient:
         return response.json()['data']
     
     def post_data(self, data_table, json_dump):
-        print("Entered here post_data")
-        print(data_table)
-        print("===================")
+        
         print(json_dump)
+        
+        
         data_table_id = data_table['data_table_schema']['id']
         data = {
             'data': json_dump,
@@ -91,7 +91,7 @@ class StaffAgentAPIClient:
         endpoint = self.endpoints['post_data'].format(id=data_table_id)
         response = requests.post(f"{self.base_url}{endpoint}", json=data)
 
-        print("Response from post_data")
+        print(response.json())
         # return response.json()
 
 staff_agent_api_client = StaffAgentAPIClient(STAFF_AGENT_API_URL)
