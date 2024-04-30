@@ -10,6 +10,7 @@ load_dotenv()
 
 STAFF_AGENT_API_URL = os.getenv('STAFF_AGENT_API_URL')
 
+
 class Call(BaseModel):
     id: int
     status: Optional[str] = None
@@ -22,6 +23,7 @@ class Call(BaseModel):
     job_application_id: Optional[int] = None
     initiated_by_id: Optional[int] = None
     phone_agent_id: Optional[int] = None
+
     class Config:
         extra = "allow"
 
@@ -35,11 +37,12 @@ class StaffAgentAPIClient:
             'get_call': '/calls/{call_id}',
             'update_call': '/calls/{call_id}',
             'get_call_context': '/call-context/{call_id}',
-            'post_data':'/data_tables/{id}/data_dumps'
+            'post_data': '/data_tables/{id}/data_dumps'
         }
 
     def get_calls(self):
-        response = requests.get(f"{self.base_url}{self.endpoints['list_calls']}")
+        response = requests.get(
+            f"{self.base_url}{self.endpoints['list_calls']}")
         return [Call(**call) for call in response.json()['data'] if isinstance(call, dict)]
 
     def get_call(self, call_id):
@@ -71,17 +74,15 @@ class StaffAgentAPIClient:
             print(response.json())
             return Call(**response.json()['data'])
 
-
     def get_call_prompt(self, call_id):
         endpoint = self.endpoints['get_call_context'].format(call_id=call_id)
         response = requests.get(f"{self.base_url}{endpoint}")
         return response.json()['data']
-    
+
     def post_data(self, data_table, json_dump):
-        
+
         print(json_dump)
-        
-        
+
         data_table_id = data_table['data_table_schema']['id']
         data = {
             'data': json_dump,
@@ -94,5 +95,5 @@ class StaffAgentAPIClient:
         print(response.json())
         # return response.json()
 
-staff_agent_api_client = StaffAgentAPIClient(STAFF_AGENT_API_URL)
 
+staff_agent_api_client = StaffAgentAPIClient(STAFF_AGENT_API_URL)

@@ -12,9 +12,9 @@ from staffagent_api import staff_agent_api_client
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-LANGCHAIN_API_KEY= os.getenv('LANGCHAIN_API_KEY')
+LANGCHAIN_API_KEY = os.getenv('LANGCHAIN_API_KEY')
 
-os.environ["LANGCHAIN_TRACING_V2"]  = "True"
+os.environ["LANGCHAIN_TRACING_V2"] = "True"
 
 
 logging.basicConfig(level=logging.INFO)
@@ -22,9 +22,11 @@ logging.basicConfig(level=logging.INFO)
 # Create a flag to control the shutdown process
 shutdown_flag = False
 
+
 def create_consumer(config):
     """Create a Kafka consumer with the specified configuration."""
     return Consumer(config)
+
 
 def signal_handler(signal, frame):
     """Handle any cleanup and exit on receiving a SIGINT or SIGTERM."""
@@ -32,9 +34,11 @@ def signal_handler(signal, frame):
     logging.info("Shutdown signal received.")
     shutdown_flag = True
 
+
 # Register signal handlers for graceful shutdown
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
+
 
 async def main():
     kafka_broker_url = os.environ.get('KAFKA_BROKER_URL', 'kafka:9092')
@@ -66,9 +70,10 @@ async def main():
                     raise KafkaException(msg.error())
             else:
                 # Proper message
-                logging.info('Received message: %s' % msg.value().decode('utf-8'))
+                logging.info('Received message: %s' %
+                             msg.value().decode('utf-8'))
                 # Process message
-                await process_message(msg) 
+                await process_message(msg)
 
                 # Commit the message offset if the message is processed successfully
                 consumer.commit(msg)
@@ -79,14 +84,15 @@ async def main():
         # Close down consumer to commit final offsets and clean up
         consumer.close()
 
+
 async def process_message(msg):
     """
     Process incoming messages.
     """
     logging.info(f"Processing message from topic {msg.topic()}, partition {msg.partition()}, offset {msg.offset()}")
     data = json.loads(msg.value().decode('utf-8'))
-    
-    data_schema =  data['data_table_schema']['columns']
+
+    data_schema = data['data_table_schema']['columns']
     model_name = data.get('model_name', 'mistralai/Mixtral-8x7B-Instruct-v0.1')
     # model_name = data.get('model_name', 'llama2')
     fallback_model = os.getenv('FALLBACK_MODEL', 'gpt-3.5-turbo')
@@ -95,24 +101,22 @@ async def process_message(msg):
     try:
         text = ResumeExtractor.extract_text_from_pdf(data['resume_path'])
         resume_processor = ResumeProcessor(OPENAI_API_KEY, data_schema)
-        
+
         try:
             if model_name:
-                structured_info = await  asyncio.wait_for(resume_processor.process_resume(text, model_name, fallback_model), timeout=timeout) 
+                structured_info = await asyncio.wait_for(resume_processor.process_resume(text, model_name, fallback_model), timeout=timeout)
             else:
-                structured_info = await  asyncio.wait_for(resume_processor.process_resume(text, fallback_model,fallback_model), timeout=timeout) 
+                structured_info = await asyncio.wait_for(resume_processor.process_resume(text, fallback_model, fallback_model), timeout=timeout)
         except Exception as e:
             logging.warning(f"Error processing message with model {model_name}: {str(e)}. Retrying with fallback model.")
-            structured_info = await  asyncio.wait_for(resume_processor.process_resume(text, fallback_model,fallback_model), timeout=timeout) 
-        
+            structured_info = await asyncio.wait_for(resume_processor.process_resume(text, fallback_model, fallback_model), timeout=timeout)
+
         api_client = staff_agent_api_client
         api_client.post_data(data, structured_info)
     except asyncio.TimeoutError:
         logging.error(f"Timeout occurred after {timeout} seconds.")
     except Exception as e:
-        logging.error(f"Error processing message: {str(e)}") 
-
-   
+        logging.error(f"Error processing message: {str(e)}")
 
 
 if __name__ == '__main__':
