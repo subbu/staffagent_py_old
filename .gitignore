@@ -14,3 +14,4 @@ message_consumers/vectorizer/dummy_producer.py
 agents/retell_ai/__pycache__/
 
 api_services/__pycache__/
+.env-prod
