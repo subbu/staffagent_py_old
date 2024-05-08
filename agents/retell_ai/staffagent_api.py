@@ -44,27 +44,28 @@ class StaffAgentAPIClient:
         response = requests.get(f"{self.base_url}{endpoint}")
         return Call(**response.json()['data'])
 
-    async def update_call(self, call_id, data):
+    # async def update_call(self, call_id, data):
+    #     endpoint = self.endpoints['update_call'].format(call_id=call_id)
+    #     async with httpx.AsyncClient() as client:
+    #         response = await client.put(f"{self.base_url}{endpoint}", json=data)
+    #         print("Updating call.......data from Ex is")
+    #         print(response.json())
+    #         return Call(**response.json()['data'])
+
+    def update_call(self, call_id, data):
         print("Updating call")
         print(data)
         endpoint = self.endpoints['update_call'].format(call_id=call_id)
-        async with httpx.AsyncClient() as client:
-            response = await client.put(f"{self.base_url}{endpoint}", json=data)
-            print(response.json())
-            return Call(**response.json()['data'])
-
-    # def update_call(self, call_id, data):
-    #     print("Updating call")
-    #     print(data)
-    #     endpoint = self.endpoints['calls'].format(call_id=call_id)
-    #     response = requests.put(f"{self.base_url}{endpoint}", json=data)
-    #     print(response.json())
-    #     return Call(**response.json()['data'])
+        response = requests.put(f"{self.base_url}{endpoint}", json=data)
+        print(response.json())
+        return Call(**response.json()['data'])
 
     async def create_call(self, data):
         endpoint = self.endpoints['create_call']
+        print("Creating call.........")
         async with httpx.AsyncClient() as client:
             response = await client.post(f"{self.base_url}{endpoint}", json=data)
+            print(response)
             print(response.json())
             return Call(**response.json()['data'])
 

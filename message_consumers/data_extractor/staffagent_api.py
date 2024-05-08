@@ -86,7 +86,8 @@ class StaffAgentAPIClient:
         data_table_id = data_table['data_table_schema']['id']
         data = {
             'data': json_dump,
-            'id': data_table_id
+            'id': data_table_id,
+            'job_application_id': data_table['job_application_id']
         }
 
         endpoint = self.endpoints['post_data'].format(id=data_table_id)
