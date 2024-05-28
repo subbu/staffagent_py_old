@@ -2,6 +2,7 @@ import PyPDF2
 import io
 import boto3
 import os
+from docx import Document
 
 
 class ResumeExtractor:
@@ -18,8 +19,18 @@ class ResumeExtractor:
         file = io.BytesIO()
         s3.download_fileobj(bucket, key, file)
         file.seek(0)  # move the cursor to the beginning of the file
-        reader = PyPDF2.PdfReader(file)
-        text = ''
-        for page in range(len(reader.pages)):
-            text += reader.pages[page].extract_text()
+        
+        if path.endswith('.pdf'):
+            reader = PyPDF2.PdfReader(file)
+            text = ''
+            for page in range(len(reader.pages)):
+                text += reader.pages[page].extract_text()
+        elif path.endswith('.docx'):
+            doc = Document(file)
+            text = ' '.join([paragraph.text for paragraph in doc.paragraphs])
+        else:
+            raise ValueError('File type not supported')
+
         return text
+
+
