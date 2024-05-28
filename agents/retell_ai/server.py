@@ -74,10 +74,13 @@ async def handle_twilio_voice_webhook(request: Request, agent_id_path: str):
                     "twilio_payload": dict(twilio_data)
                 }
                 print(f"Updating call with attrs: {attrs}")
-                updated_call = await staffagent_api.update_call(sa_call_uuid, attrs)
+                updated_call = staffagent_api.update_call(sa_call_uuid, attrs)
                 print(f"Updated call: {updated_call}")
             
             return PlainTextResponse(str(response), media_type='text/xml')
+        else:
+            print("SOMETHING WENT WRONG")
+            print(call_response)
 
     except Exception as err:
         print(f"Error in twilio voice webhook: {err}")

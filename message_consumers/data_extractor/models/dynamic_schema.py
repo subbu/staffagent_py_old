@@ -30,6 +30,19 @@ class DynamicSchemaCreator:
                                 raise ValueError(f"{sub_field_name} in {field_name} must be of type {sub_field_info.get('data_type', Any)}")
                 return v
             return field_validator(field_name)(validate_field)
+        
+        default_fields = [
+            {'name': 'addressable_name', 'data_type': 'string', 'required': False, 'default': '', 'description': 'A common name to be used for addressing them in a phone call. Usually its first name.'},
+            {'name': 'full_name', 'data_type': 'string', 'required': True, 'description': 'The full name of the person.'},
+            {'name': 'location', 'data_type': 'string', 'required': False, 'default': '', 'description': 'Current location. City and state.'},
+            {'name': 'phone1', 'data_type': 'string', 'required': False, 'default': '', 'description': 'Primary phone number.'},
+            {'name': 'phone2', 'data_type': 'string', 'required': False, 'default': '', 'description': 'Secondary phone number.'},
+            {'name': 'email1', 'data_type': 'string', 'required': False, 'default': '', 'description': 'Primary email address.'},
+            {'name': 'email2', 'data_type': 'string', 'required': False, 'default': '', 'description': 'Secondary email address.'},
+        ]
+
+        # Add the default fields to the custom fields data
+        fields_data = default_fields + fields_data
 
         for field_info in fields_data:
             field_name = field_info['name']
