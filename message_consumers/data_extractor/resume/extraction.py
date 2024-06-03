@@ -25,7 +25,7 @@ class ResumeExtractor:
             text = ''
             for page in range(len(reader.pages)):
                 text += reader.pages[page].extract_text()
-        elif path.endswith('.docx'):
+        elif path.endswith('.docx') or path.endswith('.doc'):
             doc = Document(file)
             text = ' '.join([paragraph.text for paragraph in doc.paragraphs])
         else:

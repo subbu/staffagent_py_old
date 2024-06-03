@@ -13,6 +13,7 @@ import asyncio
 import retellclient
 from staffagent_api import StaffAgentAPIClient
 import uuid
+import httpx
 
 STAFF_AGENT_API_URL = os.getenv('STAFF_AGENT_API_URL')
 
@@ -31,6 +32,7 @@ async def handle_twilio_voice_webhook(request: Request, agent_id_path: str):
     print("inside twilio voice webhook")
     print(f"Query param sa_call_uuid: {sa_call_uuid}")
     print(f"Request URL: {request.url}")
+    
     try:
         # Check if it is machine
         twilio_data = await request.form()
@@ -90,6 +92,7 @@ async def handle_twilio_voice_webhook(request: Request, agent_id_path: str):
 async def websocket_handler(websocket: WebSocket, call_id: str):
     await websocket.accept()
     print(f"===========Handle llm ws for: {call_id}")
+   
     llm_client = LlmClient(call_id)
 
     # send first message to signal ready of server
@@ -121,5 +124,13 @@ async def websocket_handler(websocket: WebSocket, call_id: str):
     except Exception as e:
         print(f'LLM WebSocket error for {call_id}: {e}')
     finally:
+        send_completed_status(call_id)
         print(f"LLM WebSocket connection closed for {call_id}")
+
+def send_completed_status(call_id: str):
+    print(f"Sending complete status for call_id: {call_id}")
+    staffagent_api.update_call(call_id, {"status": "completed"}) 
+
+
+        
 
