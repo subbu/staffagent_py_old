@@ -91,12 +91,13 @@ async def process_message(msg):
     """
     logging.info(f"Processing message from topic {msg.topic()}, partition {msg.partition()}, offset {msg.offset()}")
     data = json.loads(msg.value().decode('utf-8'))
-
+    
     data_schema = data['data_table_schema']['columns']
     model_name = data.get('model_name', 'gpt-3.5-turbo')
     # model_name = data.get('model_name', 'llama2')
     fallback_model = os.getenv('FALLBACK_MODEL', 'gpt-3.5-turbo')
     timeout = data.get('timeout', 60)
+
 
     try:
         text = ResumeExtractor.extract_text_from_pdf(data['resume_path'])
