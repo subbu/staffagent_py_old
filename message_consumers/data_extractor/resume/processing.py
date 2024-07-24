@@ -15,24 +15,34 @@ import logging
 from openai import AsyncOpenAI
 from mistralai.client import MistralClient
 import cohere
+from langfuse.decorators import langfuse_context, observe
+from langfuse import Langfuse
+
+
+ 
+
+
+
 
 logging.basicConfig(level=logging.INFO)
 
 
 class ResumeProcessor:
-    def __init__(self, openai_api_key, data_schema):
+    def __init__(self, openai_api_key, data_schema, user_id):
         self.openai_client = instructor.patch(
             wrap_openai(OpenAI(api_key=openai_api_key)))
         self.data_schema = data_schema
+        self.user_id  = user_id
         self.model_functions = {
-            "gpt-3.5-turbo": self.process_resume_openai,
+            "gpt-4o-mini": self.process_resume_openai,
             "mistralai/Mixtral-8x7B-Instruct-v0.1": self.process_resume_together,
             "mistralai/Mixtral-8x22B-Instruct-v0.1": self.process_resume_anyscale
 
         }
-
+        self.langfuse = Langfuse()
+    
+    @observe()
     async def process_resume(self, text, model_name, fallback_model):
-
         print(model_name)
         print("\n")
         process_function = self.model_functions.get(model_name)
@@ -40,10 +50,41 @@ class ResumeProcessor:
             return await process_function(text, model_name, fallback_model)
         else:
             raise ValueError(f"Unsupported model: {model_name}")
+        
+
+
+    @observe()
+    def fn(self):
+        langfuse_context.update_current_trace(
+                # session_id="15345",
+                user_id=self.user_id,
+                tags=["Resume-Extractor"]
+        )
+
 
     @traceable(run_type="llm", name="process_resume", project_name="Data-Extractor")
-    async def process_resume_openai(self, text, model_name, fallback_model):
+    @observe()
+    async def process_resume_openai(self, text, model_name, fallback_model):        
+
+        self.fn()
+        
         fields_data = self.data_schema
+
+        # self.langfuse.create_prompt(
+        #     name="resume-processing",
+        #     type="chat",
+        #     prompt=[{"role": "system", "content": "Please extract all the information from the given resume text and return it in the specified JSON format according to this schema: {{schema}}"}],
+        #     labels=["production"],
+        #     config={
+        #         "model": "gpt-4o-mini",
+        #         "temperature": 0.7,
+        #         "supported_languages": ["en"]
+        #     }
+        # )
+        
+
+        # prompt_template = self.langfuse.get_prompt("resume-processing")
+        # compiled_prompt = prompt_template.compile(schema=fields_data)
 
         prompt = f"""Please extract all the information from the given resume text and return it in the specified JSON format:
 
@@ -76,9 +117,12 @@ class ResumeProcessor:
                 max_tokens=4000,
                 n=1,
                 stop=None,
-                temperature=0.7,
+                temperature=0,
                 response_model=GeneratedSchema
             )
+            
+            
+
         except Exception as e:
             print(f"Error with model {model_name}: {str(e)}")
             print(f"Retrying with fallback model: {fallback_model}")
@@ -92,7 +136,7 @@ class ResumeProcessor:
                 max_tokens=4000,
                 n=1,
                 stop=None,
-                temperature=0.7,
+                temperature=0,
                 response_model=GeneratedSchema
             )
 
@@ -121,6 +165,7 @@ class ResumeProcessor:
             return None
 
     @traceable(run_type="llm", name="process_resume_together", project_name="Data-Extractor")
+    @observe()
     async def process_resume_together(self, text, model_name, fallback_model):
 
         print("Inside together LLM model now ")
@@ -199,6 +244,7 @@ class ResumeProcessor:
             return None
 
     @traceable(run_type="llm", name="process_resume_mixtral", project_name="Data-Extractor")
+    @observe()
     async def process_resume_anyscale(self, text, model_name, fallback_model):
         fields_data = self.data_schema
 

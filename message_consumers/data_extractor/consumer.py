@@ -59,6 +59,8 @@ async def main():
         while not shutdown_flag:
             msg = consumer.poll(1.0)  # Poll for messages
 
+           
+
             if msg is None:
                 continue
             if msg.error():
@@ -93,15 +95,15 @@ async def process_message(msg):
     data = json.loads(msg.value().decode('utf-8'))
     
     data_schema = data['data_table_schema']['columns']
-    model_name = data.get('model_name', 'gpt-3.5-turbo')
+    model_name = data.get('model_name', 'gpt-4o-mini')
     # model_name = data.get('model_name', 'llama2')
-    fallback_model = os.getenv('FALLBACK_MODEL', 'gpt-3.5-turbo')
+    fallback_model = os.getenv('FALLBACK_MODEL', 'gpt-4o-mini')
     timeout = data.get('timeout', 60)
 
 
     try:
         text = ResumeExtractor.extract_text_from_pdf(data['resume_path'])
-        resume_processor = ResumeProcessor(OPENAI_API_KEY, data_schema)
+        resume_processor = ResumeProcessor(OPENAI_API_KEY, data_schema, data['user_id'])
 
         try:
             if model_name:

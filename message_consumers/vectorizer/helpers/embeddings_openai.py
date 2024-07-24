@@ -12,7 +12,7 @@ CHUNK_OVERLAP_SIZE = os.getenv("CHUNK_OVERLAP_SIZE")
 
 def append_embeddings(nodes):
     embed_model = OpenAIEmbedding(api_key=OPENAI_API_KEY, model="text-embedding-3-large")
-    llm = OpenAI(api_key=OPENAI_API_KEY, model="gpt-3.5-turbo-0125")
+    llm = OpenAI(api_key=OPENAI_API_KEY, model="gpt-4o-mini")
     Settings.llm = llm
     Settings.embed_model = embed_model
     Settings.chunk_size = CHUNK_SIZE

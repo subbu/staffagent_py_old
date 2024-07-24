@@ -92,7 +92,7 @@ class LlmClient:
         func_call = {}
         func_arguments = ""
         stream = self.client.chat.completions.create(
-            model="gpt-4",   # type: ignore
+            model="gpt-4o-mini",   # type: ignore
             # model="gpt-3.5-turbo-0125",   # type: ignore
             messages=prompt,                # type: ignore
             stream=True,
